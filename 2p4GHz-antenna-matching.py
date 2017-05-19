@@ -20,7 +20,7 @@ w_mid =  2*math.pi*2.44e9
 w_high = 2*math.pi*2.48e9
 
 # initialize Zant antenna impedances (measured with a VNA)
-Z0 = {w_low:complex(79,67),w_mid:complex(116,-70),w_high:complex(31,-55)}
+Zant = {w_low:complex(79,67),w_mid:complex(116,-70),w_high:complex(31,-55)}
 
 Zw = complex(50,0)
 
@@ -50,15 +50,15 @@ Z = {}
 Zmin = {}
 S11_min = float("inf")
 
-print('Total of {:d} iterations to calculate'.format(len(Cp1s)*len(Ls1s)*len(Cp2s)*len(Z0)))
+print('Total of {:d} iterations to calculate'.format(len(Cp1s)*len(Ls1s)*len(Cp2s)*len(Zant)))
 
 # iterate over all Cp2s, Ls1s and Cp1s
 for Cp2 in Cp2s:
     for Ls1 in Ls1s:
         for Cp1 in Cp1s:
             S11_new = 0
-            for w in Z0:
-                Z[w] = par(Z0[w],Zcap(Cp2,w))
+            for w in Zant:
+                Z[w] = par(Zant[w],Zcap(Cp2,w))
                 Z[w] = ser(Z[w],Zind(Ls1,w))
                 Z[w] = par(Z[w],Zcap(Cp1,w))
                 S11[w] = S11_abs(Z[w])
