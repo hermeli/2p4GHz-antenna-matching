@@ -3,11 +3,16 @@
 # Script calculates optimal S11 (reflection) values
 # for a 2.4 GHz antenna matching
 
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import math
 import cmath
 import pylab as pl
+
+# import smithplot from local git path
+sys.path.append("../pySmithPlot")
+from smithplot import SmithAxes
 
 # initialize value range of components (in 
 Cp1s = pl.frange(0.1e-12,5.0e-12,0.1e-12)
@@ -21,6 +26,11 @@ w_high = 2*math.pi*2.48e9
 
 # initialize Zant antenna impedances (measured with a VNA)
 Zant = {w_low:complex(79,67),w_mid:complex(116,-70),w_high:complex(31,-55)}
+
+# plot data
+plt.figure(figsize=(10, 10))
+ax = plt.subplot(1, 1, 1, projection='smith')
+plt.plot([Zant[w_low],Zant[w_mid],Zant[w_high]],label="Zant: antenna impedances (mid/low/high)",datatype=SmithAxes.Z_PARAMETER)
 
 Zw = complex(50,0)
 
@@ -49,6 +59,9 @@ S11 = {w_low:complex(0,0),w_mid:complex(0,0),w_high:complex(0,0)}
 Z = {}
 Zmin = {}
 S11_min = float("inf")
+Cp1_min = 0
+Ls1_min = 0
+Cp2_min = 0
 
 print('Total of {:d} iterations to calculate'.format(len(Cp1s)*len(Ls1s)*len(Cp2s)*len(Zant)))
 
@@ -66,9 +79,15 @@ for Cp2 in Cp2s:
 
             if S11_new < S11_min:
                 S11_min = S11_new
-                Zmin = Z.copy()
+                Zopt = Z.copy()
                 print('New min: Cp1={:.2e} Ls1={:.2e} Cp2={:.2e} S11_min={:.5f}'.format(Cp1,Ls1,Cp2,S11_min))
-                print('Z[w]={:.2f},{:.2f},{:.2f}'.format(Zmin[w_low],Zmin[w_mid],Zmin[w_high]))
+                Cp1_min = Cp1
+                Ls1_min = Ls1
+                Cp2_min = Cp2
+                print('Z[w]={:.2f},{:.2f},{:.2f}'.format(Zopt[w_low],Zopt[w_mid],Zopt[w_high]))
     
-
+plt.plot([Zopt[w_low],Zopt[w_mid],Zopt[w_high]],label="Zopt: PI-filter input impedances with min. sum of power reflections",datatype=SmithAxes.Z_PARAMETER)
+plt.legend(loc="lower right", fontsize=12)
+plt.title("Zant to Zopt with Cp1={:.1e}/Ls1={:.1e}/Cp2={:.1e}".format(Cp1_min,Ls1_min,Cp2_min))
+plt.show()
 
