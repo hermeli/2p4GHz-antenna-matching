@@ -3,6 +3,7 @@
 # Script calculates optimal S11 (reflection) values for a 2.4 GHz
 # antenna PI-matching circuit with 0.1pf/0.1nH resolution. 
 #
+# https://github.com/hermeli/2p4GHz-antenna-matching
 # 2017, wyss@superspider.net
 #
 # Matching circuit is PI-filter:
